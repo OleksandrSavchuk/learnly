@@ -1,0 +1,27 @@
+server:
+  port: ${PORT}
+  shutdown: graceful
+
+spring:
+  config:
+    import: optional:file:.env[.properties]
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+
+security:
+  jwt:
+    private-key: ${JWT_PRIVATE_KEY}
+    public-key: ${JWT_PUBLIC_KEY}
+    access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION}     # minutes
+    refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION}   # hours
+
+logging:
+  level:
+    root: ${LOG_LEVEL:INFO}
