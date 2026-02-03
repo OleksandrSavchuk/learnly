@@ -1,4 +1,87 @@
 package com.example.learnly.service.iml;
 
-public class UserServiceImpl {
+import com.example.learnly.dto.user.CreateUserDto;
+import com.example.learnly.dto.user.UpdateProfileDto;
+import com.example.learnly.entity.user.Role;
+import com.example.learnly.entity.user.User;
+import com.example.learnly.exception.ResourceNotFoundException;
+import com.example.learnly.repository.RoleRepository;
+import com.example.learnly.repository.UserRepository;
+import com.example.learnly.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
+@Service
+@RequiredArgsConstructor
+public class UserServiceImpl implements UserService {
+
+    private final UserRepository userRepository;
+
+    private final RoleRepository roleRepository;
+
+    private final PasswordEncoder passwordEncoder;
+
+    @Override
+    public List<User> getAll() {
+        return List.of();
+    }
+
+    @Override
+    public Optional<User> getById(Long id) {
+        return userRepository.findById(id);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Optional<User> getByEmail(String email) {
+        Objects.requireNonNull(email, "email");
+
+        return userRepository.findByEmail(email);
+    }
+
+    @Transactional
+    @Override
+    public Long createUser(CreateUserDto createUserDto) {
+        Objects.requireNonNull(createUserDto, "createUserDto");
+
+        String encoded = passwordEncoder.encode(createUserDto.password());
+
+        Role defaultRole = roleRepository
+                .findByName("USER")
+                .orElseThrow(() -> new ResourceNotFoundException("Not found default role for new user " + createUserDto.email()));
+
+        User user = User.builder()
+                .email(createUserDto.email())
+                .password(encoded)
+                .role(defaultRole)
+                .firstName(createUserDto.firstName())
+                .lastName(createUserDto.lastName())
+                .build();
+
+        user = userRepository.save(user);
+
+        return user.getId();
+    }
+
+    @Override
+    public void updateProfile(Long id, UpdateProfileDto updateProfileDto) {
+
+    }
+
+    @Override
+    public void delete(Long id) {
+
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return false;
+    }
+
 }
