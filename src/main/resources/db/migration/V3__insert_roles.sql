@@ -1,4 +1,4 @@
 INSERT INTO roles (created_at, name)
-VALUES  (NOW(), 'USER'),
+VALUES  (NOW(), 'STUDENT'),
         (NOW(), 'INSTRUCTOR'),
         (NOW(), 'ADMIN');

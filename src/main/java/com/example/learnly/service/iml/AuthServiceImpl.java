@@ -39,7 +39,10 @@ public class AuthServiceImpl implements AuthService {
 
         CreateUserDto createUserDto = new CreateUserDto(
                 userRegisterRequestDto.email(),
-                userRegisterRequestDto.password()
+                userRegisterRequestDto.password(),
+                userRegisterRequestDto.firstName(),
+                userRegisterRequestDto.lastName(),
+                userRegisterRequestDto.role()
         );
 
         Long userId = userService.createUser(createUserDto);

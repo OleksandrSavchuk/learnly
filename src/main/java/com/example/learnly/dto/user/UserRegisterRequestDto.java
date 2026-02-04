@@ -9,6 +9,7 @@ public record UserRegisterRequestDto(
         @Size(min = 10, max = 100, message = "Email length must be between {min} and {max}")
         @Pattern(regexp = "^[a-zA-Z0-9._%+-]{3,}@[a-zA-Z0-9.-]{3,}\\.[a-zA-Z]{2,}$", message = "Email must match the pattern 'xxx@xxx.xx'")
         String email,
+
         @NotBlank(message = "Password must be present")
         @Size(min = 8, max = 50, message = "Password length must be between {min} and {max}")
         @Pattern(
@@ -16,12 +17,33 @@ public record UserRegisterRequestDto(
                 message = "Password must contains: capital letter, small letter, number and special symbol (!@#$%^&*)"
         )
         String password,
+
         @NotBlank(message = "Password confirmation must be present")
         @Size(min = 8, max = 50, message = "Password confirmation length must be between {min} and {max}")
         @Pattern(
                 regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]+$",
                 message = "Password confirmation must contains: capital letter, small letter, number and special symbol (!@#$%^&*)"
         )
-        String passwordConfirmation
+        String passwordConfirmation,
+
+        @NotBlank(message = "First name must be present")
+        @Size(min = 3, max = 255, message = "First name must be between {min} and {max} characters")
+        @Pattern(
+                regexp = "^[A-Za-zА-Яа-яІіЇїЄєҐґ]+(?:[-' ]?[A-Za-zА-Яа-яІіЇїЄєҐґ]+)*$",
+                message = "First name may contain one or more words with letters, spaces, hyphens, or apostrophes"
+        )
+        String firstName,
+
+        @NotBlank(message = "Last name must be present")
+        @Size(min = 3, max = 255, message = "Last name must be between {min} and {max} characters")
+        @Pattern(
+                regexp = "^[A-Za-zА-Яа-яІіЇїЄєҐґ]+(?:[-' ]?[A-Za-zА-Яа-яІіЇїЄєҐґ]+)*$",
+                message = "Last name may contain one or more words with letters, spaces, hyphens, or apostrophes"
+        )
+        String lastName,
+
+        @NotBlank(message = "Role must be present")
+        @Size(min = 3, max = 255, message = "Last name must be between {min} and {max} characters")
+        String role
 ) {
 }

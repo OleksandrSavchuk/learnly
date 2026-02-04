@@ -32,6 +32,10 @@ public record CreateUserDto(
                 regexp = "^[A-Za-zА-Яа-яІіЇїЄєҐґ]+(?:[-' ]?[A-Za-zА-Яа-яІіЇїЄєҐґ]+)*$",
                 message = "Last name may contain one or more words with letters, spaces, hyphens, or apostrophes"
         )
-        String lastName
+        String lastName,
+
+        @NotBlank(message = "Role must be present")
+        @Size(min = 3, max = 255, message = "Last name must be between {min} and {max} characters")
+        String role
 ) {
 }

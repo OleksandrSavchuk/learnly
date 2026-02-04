@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -50,16 +51,20 @@ public class UserServiceImpl implements UserService {
     public Long createUser(CreateUserDto createUserDto) {
         Objects.requireNonNull(createUserDto, "createUserDto");
 
+        if (!Set.of("STUDENT", "INSTRUCTOR").contains(createUserDto.role().trim().toUpperCase())) {
+            throw new IllegalArgumentException("Role is not allowed");
+        }
+
         String encoded = passwordEncoder.encode(createUserDto.password());
 
-        Role defaultRole = roleRepository
-                .findByName("USER")
+        Role role = roleRepository
+                .findByName(createUserDto.role().toUpperCase())
                 .orElseThrow(() -> new ResourceNotFoundException("Not found default role for new user " + createUserDto.email()));
 
         User user = User.builder()
                 .email(createUserDto.email())
                 .password(encoded)
-                .role(defaultRole)
+                .role(role)
                 .firstName(createUserDto.firstName())
                 .lastName(createUserDto.lastName())
                 .build();

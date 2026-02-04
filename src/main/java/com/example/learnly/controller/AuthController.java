@@ -5,6 +5,7 @@ import com.example.learnly.dto.jwt.JwtResponseDto;
 import com.example.learnly.dto.user.UserLoginRequestDto;
 import com.example.learnly.dto.user.UserRegisterRequestDto;
 import com.example.learnly.service.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,13 +21,13 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<JwtResponseDto> register(@RequestBody UserRegisterRequestDto userRegisterRequestDto) {
+    public ResponseEntity<JwtResponseDto> register(@RequestBody @Valid UserRegisterRequestDto userRegisterRequestDto) {
         JwtResponseDto jwtResponseDto = authService.register(userRegisterRequestDto);
         return ResponseEntity.ok(jwtResponseDto);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<JwtResponseDto> login(@RequestBody UserLoginRequestDto userLoginRequestDto) {
+    public ResponseEntity<JwtResponseDto> login(@RequestBody @Valid UserLoginRequestDto userLoginRequestDto) {
         JwtResponseDto jwtResponseDto = authService.login(userLoginRequestDto);
         return ResponseEntity.ok(jwtResponseDto);
     }
