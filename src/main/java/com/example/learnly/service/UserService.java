@@ -11,15 +11,15 @@ public interface UserService {
 
     List<User> getAll();
 
-    Optional<User> getById(Long id);
+    User getById(Long id);
 
-    Optional<User> getByEmail(String email);
+    User getByEmail(String email);
 
     Long createUser(CreateUserDto createUserDto);
 
-    void updateProfile(Long id, UpdateProfileDto updateProfileDto);
+    User updateProfile(Long id, UpdateProfileDto updateProfileDto);
 
-    void delete(Long id);
+    void deleteById(Long id);
 
     boolean existsByEmail(String email);
 

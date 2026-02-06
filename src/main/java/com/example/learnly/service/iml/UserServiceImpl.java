@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -34,16 +33,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<User> getById(Long id) {
-        return userRepository.findById(id);
+    public User getById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Not found user with id: " + id));
     }
 
     @Transactional(readOnly = true)
     @Override
-    public Optional<User> getByEmail(String email) {
+    public User getByEmail(String email) {
         Objects.requireNonNull(email, "email");
 
-        return userRepository.findByEmail(email);
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Not found user with email: " + email));
     }
 
     @Transactional
@@ -75,18 +76,31 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateProfile(Long id, UpdateProfileDto updateProfileDto) {
+    public User updateProfile(Long id, UpdateProfileDto updateProfileDto) {
+        User user = userRepository.findById(id).
+                orElseThrow(() -> new ResourceNotFoundException("Not found user with id: " + id));
 
+        String firstName = updateProfileDto.firstName();
+        if (firstName != null) {
+            user.setFirstName(firstName);
+        }
+
+        String lastName = updateProfileDto.lastName();
+        if (lastName != null) {
+            user.setLastName(lastName);
+        }
+
+        return userRepository.save(user);
     }
 
     @Override
-    public void delete(Long id) {
-
+    public void deleteById(Long id) {
+        userRepository.deleteById(id);
     }
 
     @Override
     public boolean existsByEmail(String email) {
-        return false;
+        return userRepository.existsByEmail(email);
     }
 
 }
