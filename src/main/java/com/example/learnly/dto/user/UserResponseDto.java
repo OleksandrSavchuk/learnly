@@ -1,4 +1,16 @@
 package com.example.learnly.dto.user;
 
-public record UserResponseDto() {
+import com.example.learnly.dto.role.RoleResponseDto;
+
+public record UserResponseDto(
+
+        String email,
+
+        String firstName,
+
+        String lastName,
+
+        RoleResponseDto role
+
+) {
 }
