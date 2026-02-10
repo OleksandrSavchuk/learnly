@@ -11,9 +11,9 @@ public interface UserService {
 
     List<User> getAll();
 
-    User getById(Long id);
+    Optional<User> getById(Long id);
 
-    User getByEmail(String email);
+    Optional<User> getByEmail(String email);
 
     Long createUser(CreateUserDto createUserDto);
 

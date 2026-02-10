@@ -23,8 +23,7 @@ public class SimpleUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userService
-                .getByEmail(username)
+        User user = userService.getByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Not found user with email: " + username));
 
         return new SimpleUserDetails(user);

@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -33,18 +34,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getById(Long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Not found user with id: " + id));
+    public Optional<User> getById(Long id) {
+        return userRepository.findById(id);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public User getByEmail(String email) {
+    public Optional<User> getByEmail(String email) {
         Objects.requireNonNull(email, "email");
 
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("Not found user with email: " + email));
+        return userRepository.findByEmail(email);
     }
 
     @Transactional
