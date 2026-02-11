@@ -4,6 +4,8 @@ import com.example.learnly.dto.role.RoleResponseDto;
 
 public record UserResponseDto(
 
+        Long id,
+
         String email,
 
         String firstName,

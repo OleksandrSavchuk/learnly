@@ -3,10 +3,12 @@ package com.example.learnly.controller;
 import com.example.learnly.dto.user.UpdateProfileDto;
 import com.example.learnly.dto.user.UserResponseDto;
 import com.example.learnly.entity.user.User;
+import com.example.learnly.exception.ResourceNotFoundException;
 import com.example.learnly.mapper.UserMapper;
 import com.example.learnly.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +22,7 @@ public class UserController {
 
     private final UserMapper userMapper;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<List<UserResponseDto>> getAll() {
         List<User> users = userService.getAll();
@@ -28,14 +31,17 @@ public class UserController {
         return ResponseEntity.ok(responses);
     }
 
+    @PreAuthorize("@customSecurityExpression.canAccessUser(#id)")
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDto> getById(@PathVariable Long id) {
-        User user = userService.getById(id);
+        User user = userService.getById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Not found user with id: " + id));
         UserResponseDto response = userMapper.toResponse(user);
 
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("@customSecurityExpression.canAccessUser(#id)")
     @PatchMapping("/{id}/update-profile")
     public ResponseEntity<UserResponseDto> updateProfile(@PathVariable Long id, @RequestBody UpdateProfileDto updateProfileDto) {
         User user = userService.updateProfile(id, updateProfileDto);
@@ -44,6 +50,7 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("@customSecurityExpression.canAccessUser(#id)")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteById(@PathVariable Long id) {
         userService.deleteById(id);
