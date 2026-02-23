@@ -5,6 +5,7 @@ import com.example.learnly.dto.user.CreateUserDto;
 import com.example.learnly.dto.user.UserLoginRequestDto;
 import com.example.learnly.dto.user.UserRegisterRequestDto;
 import com.example.learnly.entity.user.User;
+import com.example.learnly.exception.CriticalSystemException;
 import com.example.learnly.exception.InvalidApiRequestException;
 import com.example.learnly.exception.InvalidTokenException;
 import com.example.learnly.exception.ResourceNotFoundException;
@@ -48,7 +49,7 @@ public class AuthServiceImpl implements AuthService {
         Long userId = userService.createUser(createUserDto);
 
         User user = userService.getById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Not found user immediately after creating. User id: " + userId));
+                .orElseThrow(() -> new CriticalSystemException("Not found user immediately after creating. User id: " + userId));
 
         return createJwtResponse(user);
     }
@@ -63,7 +64,7 @@ public class AuthServiceImpl implements AuthService {
         authenticationManager.authenticate(authentication);
 
         User user = userService.getByEmail(userLoginRequestDto.email())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found after success authorization. User email: " + userLoginRequestDto.email()));
+                .orElseThrow(() -> new CriticalSystemException("User not found after success authorization. User email: " + userLoginRequestDto.email()));
 
         return createJwtResponse(user);
     }
