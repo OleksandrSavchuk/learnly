@@ -18,6 +18,26 @@ import java.util.Map;
 @Slf4j
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(CriticalSystemException.class)
+    public ResponseEntity<ProblemDetail> handleCriticalSystemException(CriticalSystemException e) {
+        log.error("500  A critical error occurred that should not have occurred: {}", e.getMessage(), e);
+
+        String message = """
+                Occurred an unexpected error on the server side. We are already working on it. Please, try again later.
+                
+                error occurred:
+                %s
+                """.formatted(e.getMessage());
+        var problem = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        problem.setTitle("Unexpected Internal Server Error");
+        problem.setDetail(message);
+
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(problem);
+    }
+
     @ExceptionHandler(InvalidTokenException.class)
     public ResponseEntity<ProblemDetail> handleInvalidTokenException(InvalidTokenException e) {
         log.warn("401  Invalid jwt: {}", e.getMessage());
@@ -53,11 +73,9 @@ public class GlobalExceptionHandler {
 
         Map<String, List<String>> errors = new HashMap<>();
 
-        e.getBindingResult().getFieldErrors().forEach(error -> {
-            errors
-                    .computeIfAbsent(error.getField(), k -> new ArrayList<>())
-                    .add(error.getDefaultMessage());
-        });
+        e.getBindingResult().getFieldErrors().forEach(error -> errors
+                .computeIfAbsent(error.getField(), k -> new ArrayList<>())
+                .add(error.getDefaultMessage()));
 
         return ResponseEntity
                 .badRequest()
