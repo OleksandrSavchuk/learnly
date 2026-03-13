@@ -1,4 +1,7 @@
 package com.example.learnly.dto.course;
 
-public record UpdateCourseDto() {
+public record UpdateCourseDto(
+        String title,
+        String description
+) {
 }

@@ -1,11 +1,8 @@
 package com.example.learnly.security.expression;
 
-import com.example.learnly.entity.user.User;
-import com.example.learnly.exception.ResourceNotFoundException;
-import com.example.learnly.service.UserService;
+import com.example.learnly.security.SimpleUserDetails;
+import com.example.learnly.service.CourseService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -13,21 +10,24 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CustomSecurityExpression {
 
-    private final UserService userService;
+    private final CourseService courseService;
 
     public boolean canAccessUser(Long id) {
-        User user = getCurrentUser();
-        return user.getId().equals(id) || user.getRole().getName().equals("ADMIN");
+        Long userId = getCurrentUserId();
+        return userId.equals(id);
     }
 
-    private User getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AccessDeniedException("Unauthenticated");
-        }
-        String username = authentication.getName();
-        return userService.getByEmail(username)
-                .orElseThrow(() -> new ResourceNotFoundException("Not found user with email: " + username));
+    public boolean canAccessCourse(Long courseId) {
+        Long userId = getCurrentUserId();
+        return courseService.isOwner(courseId, userId);
+    }
+
+    private Long getCurrentUserId() {
+        SimpleUserDetails user = (SimpleUserDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+        return user.getId();
     }
 
 }

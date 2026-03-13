@@ -24,7 +24,7 @@ public abstract class BaseEntity {
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Instant updatedAt;
 
     @PrePersist
