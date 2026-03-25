@@ -4,14 +4,19 @@ import com.example.learnly.dto.course.CourseResponseDto;
 import com.example.learnly.dto.course.CreateCourseDto;
 import com.example.learnly.dto.course.UpdateCourseDto;
 import com.example.learnly.dto.enrollment.EnrollmentResponseDto;
+import com.example.learnly.dto.lesson.CreateLessonDto;
+import com.example.learnly.dto.lesson.LessonResponseDto;
 import com.example.learnly.entity.course.Course;
 import com.example.learnly.entity.course.Enrollment;
+import com.example.learnly.entity.lesson.Lesson;
 import com.example.learnly.exception.ResourceNotFoundException;
 import com.example.learnly.mapper.CourseMapper;
 import com.example.learnly.mapper.EnrollmentMapper;
+import com.example.learnly.mapper.LessonMapper;
 import com.example.learnly.security.SimpleUserDetails;
 import com.example.learnly.service.CourseService;
 import com.example.learnly.service.EnrollmentService;
+import com.example.learnly.service.LessonService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,9 +35,13 @@ public class CourseController {
 
     private final EnrollmentService enrollmentService;
 
+    private final LessonService lessonService;
+
     private final CourseMapper courseMapper;
 
     private final EnrollmentMapper enrollmentMapper;
+
+    private final LessonMapper lessonMapper;
 
     @GetMapping
     public ResponseEntity<List<CourseResponseDto>> getAll() {
@@ -60,7 +69,7 @@ public class CourseController {
     }
 
     @PreAuthorize("hasRole('ADMIN') or @customSecurityExpression.canAccessCourse(#id)")
-    @PatchMapping("/{id}/update")
+    @PatchMapping("/{id}")
     public ResponseEntity<CourseResponseDto> update(@PathVariable Long id,
                                                     @RequestBody UpdateCourseDto updateCourseDto) {
         Course course = courseService.update(id, updateCourseDto);
@@ -68,13 +77,14 @@ public class CourseController {
         return ResponseEntity.ok(courseResponseDto);
     }
 
-    @PreAuthorize("hasRole('ADMIN') or @customSecurityExpression.canAccessCourse(#id)")
+    @PreAuthorize("hasRole('ADMIN') or @customSecurityExpression.isCourseOwner(#id)")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteById(@PathVariable Long id) {
         courseService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasRole('STUDENT')")
     @PostMapping("/{courseId}/enroll")
     public ResponseEntity<EnrollmentResponseDto> enroll(@PathVariable Long courseId,
                                                         @AuthenticationPrincipal SimpleUserDetails simpleUserDetails) {
@@ -83,12 +93,32 @@ public class CourseController {
         return ResponseEntity.ok(enrollmentResponseDto);
     }
 
+    @PreAuthorize("hasRole('STUDENT')")
     @PostMapping("/{courseId}/unenroll")
     public ResponseEntity<EnrollmentResponseDto> unenroll(@PathVariable Long courseId,
                                                           @AuthenticationPrincipal SimpleUserDetails simpleUserDetails) {
         Enrollment enrollment = enrollmentService.unenroll(courseId, simpleUserDetails.getId());
         EnrollmentResponseDto enrollmentResponseDto = enrollmentMapper.toResponse(enrollment);
         return ResponseEntity.ok(enrollmentResponseDto);
+    }
+
+    @PreAuthorize("@customSecurityExpression.canAccessCourse(#courseId)")
+    @GetMapping("/{courseId}/lessons")
+    public ResponseEntity<List<LessonResponseDto>> getAllLessonsByCourseId(@PathVariable Long courseId) {
+        List<Lesson> lessons = lessonService.getAllByCourseId(courseId);
+        List<LessonResponseDto> lessonResponseDtoList = lessonMapper.toResponse(lessons);
+        return ResponseEntity.ok(lessonResponseDtoList);
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or @customSecurityExpression.isCourseOwner(#courseId)")
+    @PostMapping("/{courseId}/lessons")
+    public ResponseEntity<LessonResponseDto> createLesson(@PathVariable Long courseId,
+                                                    @RequestBody CreateLessonDto createLessonDto) {
+        Lesson lesson = lessonService.create(courseId, createLessonDto);
+        LessonResponseDto lessonResponseDto = lessonMapper.toResponse(lesson);
+        return ResponseEntity
+                .created(URI.create("/api/courses/" + courseId + "/lessons/" + lesson.getId()))
+                .body(lessonResponseDto);
     }
 
 }

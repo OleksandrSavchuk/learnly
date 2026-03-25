@@ -8,4 +8,6 @@ public interface EnrollmentService {
 
     Enrollment unenroll(Long courseId, Long userId);
 
+    boolean isEnrolled(Long courseId, Long userId);
+
 }
