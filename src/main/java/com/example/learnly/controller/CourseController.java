@@ -113,7 +113,7 @@ public class CourseController {
     @PreAuthorize("hasRole('ADMIN') or @customSecurityExpression.isCourseOwner(#courseId)")
     @PostMapping("/{courseId}/lessons")
     public ResponseEntity<LessonResponseDto> createLesson(@PathVariable Long courseId,
-                                                    @RequestBody CreateLessonDto createLessonDto) {
+                                                          @RequestBody CreateLessonDto createLessonDto) {
         Lesson lesson = lessonService.create(courseId, createLessonDto);
         LessonResponseDto lessonResponseDto = lessonMapper.toResponse(lesson);
         return ResponseEntity
